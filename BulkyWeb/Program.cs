@@ -10,7 +10,6 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration["ConnectionStrings"]);
 });
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
