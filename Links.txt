@@ -1,0 +1,3 @@
+
+bootswatch - themes for bootstrap projects => https://bootswatch.com/
+toastr - templates for messages => https://codeseven.github.io/toastr/
