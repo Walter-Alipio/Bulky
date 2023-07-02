@@ -21,12 +21,13 @@ namespace BulkyWeb.Areas.Admin.Controllers
         // GET: ProductController
         public ActionResult Index()
         {
-            List<Product> product = _unitOfWork.ProductRepository.GetAll(includeproperties:"Category").ToList();
+            List<Product> productList = _unitOfWork.ProductRepository.GetAll(includeproperties:"Category").ToList();
          
-            return View(product);
+            return View(productList);
         }
 
         // GET: ProductController/Create
+        // GET: ProductController/Update
         public ActionResult Upsert(int? id)
         {
            // ViewBag.CategoryList = CategoryList;
@@ -51,6 +52,7 @@ namespace BulkyWeb.Areas.Admin.Controllers
             return View(productVM);
         }
         // POST: ProductController/Create
+        // POST: ProductController/Update
         [HttpPost]
         public ActionResult Upsert(ProductVM productVM, IFormFile? file)
         {
@@ -103,73 +105,33 @@ namespace BulkyWeb.Areas.Admin.Controllers
                 return View(productVM);
             }
         }
-        
 
-
-        //// GET: ProductController/Edit/5
-        //public ActionResult Edit(int? id)
-        //{
-        //    if (id is null || id is 0)
-        //    {
-        //        return NotFound();
-        //    }
-        //    Product? productFromDb = _unitOfWork.ProductRepository.Get(u => u.Id == id);
-        //    if (productFromDb is null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return View(productFromDb);
-        //}
-
-        //// POST: ProductController/Edit/product
-        //[HttpPost]
-        //public ActionResult Edit(Product product)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        _unitOfWork.ProductRepository.Update(product);
-        //        _unitOfWork.Save();
-        //        TempData["success"] = "Product edited successfully";
-        //        return RedirectToAction("Index");
-        //    }
-
-        //    return View();
-        //}
-
-        // GET: ProductController/Delete/5
+        #region API CALLS
+        [HttpGet]
+        public ActionResult GetAll() 
+        {
+            List<Product> productList = _unitOfWork.ProductRepository.GetAll(includeproperties:"Category").ToList();
+            return Json(new {data = productList });
+        }
+        [HttpDelete]
         public ActionResult Delete(int? id)
         {
-            if (id is null || id is 0)
+            var productToBeDeleted = _unitOfWork.ProductRepository.Get(u => u.Id == id);
+            if (productToBeDeleted is null)
             {
-                return NotFound();
+                return Json(new { succes = false, message = "Error while deleting" });
             }
-            Product? productFromDb = _unitOfWork.ProductRepository.Get(u => u.Id == id);
-            if (productFromDb is null)
-            {
-                return NotFound();
-            }
-            return View(productFromDb);
-        }
+            var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, productToBeDeleted.ImageUrl.Trim('\\'));
 
-        // POST: ProductController/Delete/5
-        [HttpPost]
-        public ActionResult Delete(int? id, Product product)
-        {
-            if (id is null || id is 0)
+            if (System.IO.File.Exists(oldImagePath))
             {
-                return NotFound();
+                System.IO.File.Delete(oldImagePath);
             }
-            Product? productFromDb = _unitOfWork.ProductRepository.Get(u => u.Id == id);
-            if (productFromDb is null)
-            {
-                return NotFound();
-            }
-
-            _unitOfWork.ProductRepository.Remove(productFromDb);
+            _unitOfWork.ProductRepository.Remove(productToBeDeleted);
             _unitOfWork.Save();
-            TempData["success"] = "Product deleted successfully";
-            return RedirectToAction("Index");
 
+            return Json(new { succes = true, message = "Delete Successful" });
         }
+        #endregion
     }
 }

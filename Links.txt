@@ -2,3 +2,5 @@
 bootswatch - themes for bootstrap projects => https://bootswatch.com/
 toastr - templates for messages => https://codeseven.github.io/toastr/
 tinymce - a costomizable text-area with many features => www.tiny.cloud
+datatables - plugin for jquery for a robust data table => datatabes.net
+sweetalert2 - funcy notifications => https://sweetalert2.github.io/
